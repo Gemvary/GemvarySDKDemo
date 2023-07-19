@@ -232,7 +232,7 @@ class SceneControlManagerPhotoRecv: NSObject, Codable {
     
     /// 插入到数据库
     func insertScene() -> Void {
-        let scene = Scene()
+        var scene = Scene()
         scene.scene_id = self.scene_id
         scene.icon = self.icon
         scene.type = self.scene_type

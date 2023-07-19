@@ -48,6 +48,11 @@ http://gemvary.51vip.biz:5000
     2.2 局域网搜索主机设备
 3.添加节点设备
 
+```
+
+git push -u origin main
+```
+
 ## Usage
 引入SDK
 ```

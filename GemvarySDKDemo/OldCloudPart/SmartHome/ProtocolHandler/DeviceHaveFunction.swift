@@ -86,12 +86,12 @@ class DeviceHaveFunctionQueryMultiRecv: NSObject, Codable {
 }
 
 /// 设备功能属性
-class FuncAttr: NSObject, Codable {
-    /// 设备类型
-    var dev_class_type: String?
-    /// 功能属性信息
-    var functions: [Function]?
-}
+//class FuncAttr: NSObject, Codable {
+//    /// 设备类型
+//    var dev_class_type: String?
+//    /// 功能属性信息
+//    var functions: [Function]?
+//}
 
 class DeviceHaveFunctionQueryHandler: NSObject {
     /// 发送数据

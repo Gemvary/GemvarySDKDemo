@@ -24,14 +24,16 @@ class NewDeviceDetailsVC: UIViewController {
         return tableView
     }()
     
+    /// 详情页功能
     var dataList: [String] = [
         "修改设备名字",
         "删除设备",
     ]
     
+    /// 当前设备信息
     var device: Device = Device() {
         didSet {
-            
+            self.tableView.reloadData()
         }
     }
     
@@ -66,7 +68,6 @@ extension NewDeviceDetailsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        // 弹出提示
         let text = self.dataList[indexPath.row]
         
         switch text {

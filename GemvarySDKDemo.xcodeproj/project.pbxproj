@@ -60,6 +60,8 @@
 		D8E8815E280E978700BEE04C /* NewCommunityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E8815D280E978700BEE04C /* NewCommunityVC.swift */; };
 		D8E88160280E99B900BEE04C /* NewSmartHomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E8815F280E99B900BEE04C /* NewSmartHomeVC.swift */; };
 		D8E88162280FA68700BEE04C /* NewPropertyListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E88161280FA68700BEE04C /* NewPropertyListVC.swift */; };
+		D8F7C47A2A667E1C002FB9E2 /* NewRoomListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F7C4792A667E1C002FB9E2 /* NewRoomListVC.swift */; };
+		D8F7C47E2A668491002FB9E2 /* NewFamilyListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F7C47D2A668491002FB9E2 /* NewFamilyListVC.swift */; };
 		E278E98926C6486900B0914F /* UserDataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E278E98526C6486900B0914F /* UserDataBase.swift */; };
 		E278E98A26C6486900B0914F /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E278E98626C6486900B0914F /* LoginVC.swift */; };
 		E278E98B26C6486900B0914F /* UserTokenLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E278E98726C6486900B0914F /* UserTokenLogin.swift */; };
@@ -221,6 +223,8 @@
 		D8E8815D280E978700BEE04C /* NewCommunityVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCommunityVC.swift; sourceTree = "<group>"; };
 		D8E8815F280E99B900BEE04C /* NewSmartHomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSmartHomeVC.swift; sourceTree = "<group>"; };
 		D8E88161280FA68700BEE04C /* NewPropertyListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPropertyListVC.swift; sourceTree = "<group>"; };
+		D8F7C4792A667E1C002FB9E2 /* NewRoomListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRoomListVC.swift; sourceTree = "<group>"; };
+		D8F7C47D2A668491002FB9E2 /* NewFamilyListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewFamilyListVC.swift; sourceTree = "<group>"; };
 		E278E98526C6486900B0914F /* UserDataBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDataBase.swift; sourceTree = "<group>"; };
 		E278E98626C6486900B0914F /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		E278E98726C6486900B0914F /* UserTokenLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserTokenLogin.swift; sourceTree = "<group>"; };
@@ -342,13 +346,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		D80E40442A626F03005B4057 /* Content */ = {
+		D80E40442A626F03005B4057 /* Device */ = {
 			isa = PBXGroup;
 			children = (
 				D8C0F49E2A61571500DFF258 /* NewDeviceContentVC.swift */,
 				D80E40422A626C79005B4057 /* NewDeviceDetailsVC.swift */,
 			);
-			path = Content;
+			path = Device;
 			sourceTree = "<group>";
 		};
 		D81832BC280D71A4006F50DE /* NewCloudPart */ = {
@@ -454,6 +458,7 @@
 			isa = PBXGroup;
 			children = (
 				D85DAACB281915DC001FD99B /* NewZoneListVC.swift */,
+				D8F7C47D2A668491002FB9E2 /* NewFamilyListVC.swift */,
 				D85DAACD28191743001FD99B /* NewOwnerRoomListVC.swift */,
 			);
 			path = User;
@@ -475,16 +480,11 @@
 			isa = PBXGroup;
 			children = (
 				D8E8815F280E99B900BEE04C /* NewSmartHomeVC.swift */,
-				D8C0F4722A5FF80700DFF258 /* NewSpaceListVC.swift */,
-				D8C0F4742A5FFAC200DFF258 /* NewHostDeviceVC.swift */,
-				D80E40442A626F03005B4057 /* Content */,
-				D8C0F4762A5FFBEE00DFF258 /* NewLanDeviceVC.swift */,
-				D8C0F47C2A611FA300DFF258 /* AddDevice */,
-				D85DAACF281A3ACC001FD99B /* NewNodeDeviceVC.swift */,
 				D8E0CC74281008D90070391D /* NewCloudAPITestVC.swift */,
-				D8E0CC4A280FF0160070391D /* WebSocketHandler.swift */,
-				D8E8277B2A5EA4C100B90D6D /* NewSceneListVC.swift */,
-				D8E8277D2A5EA4DA00B90D6D /* NewLinkageListVC.swift */,
+				D8F7C47C2A668439002FB9E2 /* Content */,
+				D80E40442A626F03005B4057 /* Device */,
+				D8C0F47C2A611FA300DFF258 /* AddDevice */,
+				D8F7C47B2A668415002FB9E2 /* Handler */,
 			);
 			path = SmartHome;
 			sourceTree = "<group>";
@@ -497,6 +497,28 @@
 				D8E0CC3B280FE2580070391D /* NewPropertyWorkHandler.swift */,
 			);
 			path = Property;
+			sourceTree = "<group>";
+		};
+		D8F7C47B2A668415002FB9E2 /* Handler */ = {
+			isa = PBXGroup;
+			children = (
+				D8E0CC4A280FF0160070391D /* WebSocketHandler.swift */,
+			);
+			path = Handler;
+			sourceTree = "<group>";
+		};
+		D8F7C47C2A668439002FB9E2 /* Content */ = {
+			isa = PBXGroup;
+			children = (
+				D8C0F4722A5FF80700DFF258 /* NewSpaceListVC.swift */,
+				D8C0F4762A5FFBEE00DFF258 /* NewLanDeviceVC.swift */,
+				D8C0F4742A5FFAC200DFF258 /* NewHostDeviceVC.swift */,
+				D8F7C4792A667E1C002FB9E2 /* NewRoomListVC.swift */,
+				D85DAACF281A3ACC001FD99B /* NewNodeDeviceVC.swift */,
+				D8E8277B2A5EA4C100B90D6D /* NewSceneListVC.swift */,
+				D8E8277D2A5EA4DA00B90D6D /* NewLinkageListVC.swift */,
+			);
+			path = Content;
 			sourceTree = "<group>";
 		};
 		DCAED46EBEA1686DE91ECA84 /* Pods */ = {
@@ -1041,6 +1063,7 @@
 				E2C30C3E26DDDD81004AEBE8 /* AccountInfo.swift in Sources */,
 				E2D5D2C626F329D8006D0EF5 /* SceneControlManager.swift in Sources */,
 				D8C0F4772A5FFBEE00DFF258 /* NewLanDeviceVC.swift in Sources */,
+				D8F7C47A2A667E1C002FB9E2 /* NewRoomListVC.swift in Sources */,
 				E2D5D2B326F32830006D0EF5 /* Scene.swift in Sources */,
 				E2D30F872682CEA80080002B /* PropertyListVC.swift in Sources */,
 				E278E99426C6488200B0914F /* Zone.swift in Sources */,
@@ -1118,6 +1141,7 @@
 				E2D30F9E26848FF60080002B /* DDServiceAPI.swift in Sources */,
 				D8E8815A280E908700BEE04C /* NewLoginAuthVC.swift in Sources */,
 				D8E0CC5A280FF0170070391D /* RequestHandler.swift in Sources */,
+				D8F7C47E2A668491002FB9E2 /* NewFamilyListVC.swift in Sources */,
 				D8E0CC55280FF0170070391D /* MessageHandler.swift in Sources */,
 				E2C30C2C26DDCD55004AEBE8 /* SmartHomeMainVC.swift in Sources */,
 			);

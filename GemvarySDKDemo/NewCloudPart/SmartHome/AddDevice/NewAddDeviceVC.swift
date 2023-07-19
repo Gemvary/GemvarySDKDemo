@@ -7,6 +7,8 @@
 
 import UIKit
 import SnapKit
+import GemvarySmartHomeSDK
+import GemvaryCommonSDK
 
 /// 新云端添加设备
 class NewAddDeviceVC: UIViewController {
@@ -22,10 +24,12 @@ class NewAddDeviceVC: UIViewController {
         return tableView
     }()
     
-    var dataList: [String] = [
+    private var dataList: [String] = [
         "添加Zigbee节点设备",
         "添加Wi-Fi网关设备",
     ]
+    /// 设备类型
+    var deviceClass: DeviceClass = DeviceClass()
         
     
     override func viewDidLoad() {
@@ -36,6 +40,13 @@ class NewAddDeviceVC: UIViewController {
         self.view.addSubview(self.tableView)
         self.tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        /// 查询当前主机
+        let hostDevices = Device.queryGateway()
+        swiftDebug("查询到的主机设备::: ", hostDevices)
+        if hostDevices.count <= 0 {
+            ProgressHUD.showText("主机设备个数为0")
         }
     }
         
@@ -74,15 +85,16 @@ extension NewAddDeviceVC: UITableViewDelegate, UITableViewDataSource {
 
 extension NewAddDeviceVC {
     
-    private func sendSearchDevice() -> Void {
+    /// 是否开始配网
+    private func sendSearchDevice(command: Bool) -> Void {
         
         let sendData = [
-            "gid": "self.device.gid",
-            "host_mac": "self.device.host_mac",
-            "msg_type": "device_join_control",
+            "gid": "self.device.gid", // 当前主机设备的gid
+            "host_mac": "self.device.host_mac", // 当前主机设备地址
+            "msg_type": MsgType.device_join_control,
             // allow:开始入网 stop:停止入网
-            "command": "command", // ? "allow" : "stop",
-            "from_role": "phone",
+            "command": command ? Command.allow : Command.stop,
+            "from_role": FromRole.phone,
             "from_account": "self.getAccount()",
             "dev_name": "self.device.dev_name",
             "room_name": "self.device.room_name",
@@ -108,11 +120,11 @@ extension NewAddDeviceVC {
             "gid": "gid",
             "product_id": "product_id",
             "group_id": "self.groupId",
-            "msg_type" : "device_manager",
-            "from_role" : "phone",
+            "msg_type" : MsgType.device_manager,
+            "from_role" : FromRole.phone,
             "from_account" : "self.getAccount()",
             "riu_id" :  "self.currentDevice.riu_id",
-            "dev_class_type" : "self.currentDevice.dev_class_type",
+            "dev_class_type" : "self.currentDevice.dev_class_type", // 当前信息的类型
             "dev_addr" : "self.currentDevice.dev_addr",
             "dev_net_addr" : "self.currentDevice.dev_net_addr",
             "dev_uptype" : "self.currentDevice.dev_uptype",
@@ -141,5 +153,72 @@ extension NewAddDeviceVC {
         
     }
     
+    /**
+     
+     /// 更新设备
+     msg_type: "device_manager",
+     command: "update",
+     
+     required init?(coder: NSCoder) {
+     fatalError("init(coder:) has not been implemented")
+     }
+     from_role: "phone",
+     from_account: self.getAccount(),
+     gid: gid,
+     
+     riu_id:newDevice.riu_id,
+     dev_addr:newDevice.dev_addr,
+     dev_net_addr:newDevice.dev_net_addr,
+     host_mac:newDevice.host_mac,
+     duration:1,
+     online:1,
+     dev_uptype:newDevice.dev_uptype,
+     
+     dev_class_type:oldDevice.dev_class_type,
+     room_name:oldDevice.room_name,
+     dev_name:oldDevice.dev_name,
+     dev_key:oldDevice.dev_key,
+     
+     */
+    
+    /**
+        
+     /// 检查设备是否存在
+     msg_type: "device_manager",
+     command: "dev_check",
+     from_role: "phone",
+     from_account: self.getAccount(),
+     gid: gid,
+     dev_addr:dev_addr,
+     dev_class_type:dev_class_type,
+     riu_id:riu_id,
+     host_mac:host_mac
+     
+     */
+    
+    
+}
+
+/// HeaderView
+class NewAddDeviceHeaderView: UITableViewHeaderFooterView {
+    
+    private var titleLabel: UILabel = {
+        let label = UILabel()
+        return label
+    }()
+    
+    
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
+        
+        self.contentView.addSubview(self.titleLabel)
+        self.titleLabel.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
 }

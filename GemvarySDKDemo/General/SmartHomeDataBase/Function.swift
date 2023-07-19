@@ -8,7 +8,15 @@
 import GRDB
 import GemvarySmartHomeSDK
 
-class Function: NSObject, Codable {
+struct FuncAttr: Codable {
+    /// 设备类型
+    var dev_class_type: String?
+    /// 功能属性信息
+    var functions: [Function]?
+}
+
+/// 设备功能属性信息类
+struct Function: Codable {
     /// 设置rowID
     var id: Int64?
     /// 1.固定取值 2.自定义取值 3.枚举值
@@ -58,10 +66,9 @@ class Function: NSObject, Codable {
         /// 单位
         case unit
     }
-    
-    
+        
     /// 设置rowid
-    func didInsert(with rowID: Int64, for column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
         self.id = rowID
     }
     
@@ -112,12 +119,11 @@ extension Function: MutablePersistableRecord, FetchableRecord {
         }
     }
     
-    //MARK: 功能参数 插入
     // 功能参数
     static func insert(function: Function) -> Void {
         // 查询数据是否存在
         guard Function.query(function: function) == nil else {
-            swiftDebug("设备属性 已经存在...", function)
+            debugPrint("设备属性 已经存在...", function)
             return
         }
         // 创建数据库
@@ -141,11 +147,11 @@ extension Function: MutablePersistableRecord, FetchableRecord {
     /// 功能数组 插入到数据库
     static func insert(functionPart: String, funcAttr: FuncAttr) -> Void {
         if functionPart == FunctionPart.param {
-            swiftDebug("准备插入的数据::", functionPart, funcAttr)
+            debugPrint("准备插入的数据::", functionPart, funcAttr)
         }
         if let functions = funcAttr.functions, let dev_class_type = funcAttr.dev_class_type {
             for function in functions {
-                let functionTemp = function
+                var functionTemp = function
                 // 功能属性
                 functionTemp.function_part = functionPart
                 // 设备类型
@@ -164,9 +170,7 @@ extension Function: MutablePersistableRecord, FetchableRecord {
             Function.insert(functionPart: functionPart, funcAttr: funcAttr)
         }
     }
-    
-    
-    //MARK: 查询
+        
     /// 查询
     static func query(devClassType: String, functionPart: String, funcCommand: String) -> Function? {
         // 创建数据库表
@@ -189,11 +193,14 @@ extension Function: MutablePersistableRecord, FetchableRecord {
                     }
                 }
                 
-                return try Function.filter(Column(Columns.dev_class_type.rawValue) == devClassType).filter(Column(Columns.function_part.rawValue) == functionPart).filter(Column(Columns.func_command.rawValue) == funcCommand).fetchOne(db)
+                return try Function
+                    .filter(Column(Columns.dev_class_type.rawValue) == devClassType)
+                    .filter(Column(Columns.function_part.rawValue) == functionPart)
+                    .filter(Column(Columns.func_command.rawValue) == funcCommand)
+                    .fetchOne(db)
             }
             
             return function
-            //return try Function.filter(Column(Columns.dev_class_type.rawValue) == devClassType).filter(Column(Columns.function_part.rawValue) == functionPart).filter(Column(Columns.func_command.rawValue) == funcCommand).fetchOne(db)
         })
     }
     
@@ -203,7 +210,11 @@ extension Function: MutablePersistableRecord, FetchableRecord {
         Function.createTable()
         // 查询
         return try! Function.dbPool.unsafeRead({ (db) -> Function? in
-            return try Function.filter(Column(Columns.dev_class_type.rawValue) == devClassType).filter(Column(Columns.function_part.rawValue) == functionPart).filter(Column(Columns.func_name.rawValue) == funcName).fetchOne(db)
+            return try Function
+                .filter(Column(Columns.dev_class_type.rawValue) == devClassType)
+                .filter(Column(Columns.function_part.rawValue) == functionPart)
+                .filter(Column(Columns.func_name.rawValue) == funcName)
+                .fetchOne(db)
         })
     }
     
@@ -213,7 +224,10 @@ extension Function: MutablePersistableRecord, FetchableRecord {
         Function.createTable()
         // 查询
         return try! Function.dbPool.unsafeRead({ (db) -> [Function] in
-            return try Function.filter(Column(Columns.dev_class_type.rawValue) == dev_class_type).filter(Column(Columns.function_part.rawValue) == function_part).fetchAll(db)
+            return try Function
+                .filter(Column(Columns.dev_class_type.rawValue) == dev_class_type)
+                .filter(Column(Columns.function_part.rawValue) == function_part)
+                .fetchAll(db)
         })
     }
     
@@ -222,16 +236,18 @@ extension Function: MutablePersistableRecord, FetchableRecord {
         Function.createTable()
         // 查询
         let functions: [Function] = try! Function.dbPool.unsafeRead({ (db) -> [Function] in
-            //
-            return try Function.filter(Column(Columns.function_part.rawValue) == functionPart).fetchAll(db)
+            
+            return try Function
+                .filter(Column(Columns.function_part.rawValue) == functionPart)
+                .fetchAll(db)
         })
         // 设备类型数组
         var devClassTypeList: [String] = [String]()
         
         for function in functions {
-            if devClassTypeList.contains(function.dev_class_type!) == false {
+            if let dev_class_type = function.dev_class_type, devClassTypeList.contains(dev_class_type) == false {
                 // 添加到数组中
-                devClassTypeList.append(function.dev_class_type!)
+                devClassTypeList.append(dev_class_type)
             }
         }
         
@@ -264,7 +280,6 @@ extension Function: MutablePersistableRecord, FetchableRecord {
         })
     }
     
-    //MARK: 更新
     /// 更新
     static func update(function: Function) -> Void {
         // 创建数据库表
@@ -282,9 +297,7 @@ extension Function: MutablePersistableRecord, FetchableRecord {
             }
         })
     }
-    
-    
-    //MARK: 功能参数 删除
+        
     /// 删除所有数据库
     static func deleteAll() -> Void {
         // 创建数据库
@@ -325,7 +338,10 @@ extension Function: MutablePersistableRecord, FetchableRecord {
         try! Function.dbPool.writeInTransaction(Database.TransactionKind.exclusive, { (db) -> Database.TransactionCompletion in
             do {
                 // 删除数据
-                try Function.filter(Column(Columns.function_part.rawValue) == functionPart).deleteAll(db)
+                try Function
+                    .filter(Column(Columns.function_part.rawValue) == functionPart)
+                    .deleteAll(db)
+                
                 return Database.TransactionCompletion.commit
             } catch {
                 return Database.TransactionCompletion.rollback
@@ -334,12 +350,3 @@ extension Function: MutablePersistableRecord, FetchableRecord {
     }
     
 }
-
-//MARK: 设备功能属性
-/// 设备功能属性
-//class FuncAttr: NSObject, Codable {
-//    /// 设备类型
-//    var dev_class_type: String?
-//    /// 功能属性信息
-//    var functions: [Function]?
-//}

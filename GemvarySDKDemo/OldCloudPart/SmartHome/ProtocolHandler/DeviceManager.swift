@@ -170,7 +170,7 @@ class DeviceManagerAddRecv: NSObject, Codable {
     /// 初始化device并插入值到数据库
     func insertDevice() -> Void {
         // 初始化设备值
-        let device = Device()
+        var device = Device()
         device.dev_id = self.dev_id
         device.dev_name = self.dev_name
         device.dev_class_type = self.dev_class_type

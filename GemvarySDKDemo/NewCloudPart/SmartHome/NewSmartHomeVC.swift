@@ -41,7 +41,8 @@ class NewSmartHomeVC: UIViewController {
         "空间列表",
         //"网络主机列表",
         //"局域网设备列表",
-        "节点设备列表",
+        "设备列表", // 空间/房间内的设备列表
+        "房间列表",
         "场景列表",
         "联动列表",
     ]
@@ -82,10 +83,15 @@ extension NewSmartHomeVC: UITableViewDelegate, UITableViewDataSource {
             newLanDeviceVC.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(newLanDeviceVC, animated: true)
             break
-        case "节点设备列表":
+        case "设备列表": // 空间/房间内的设备列表
             let newNodeDeviceVC = NewNodeDeviceVC()
             newNodeDeviceVC.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(newNodeDeviceVC, animated: true)
+            break
+        case "房间列表":
+            let newRoomListVC = NewRoomListVC()
+            newRoomListVC.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(newRoomListVC, animated: true)
             break
         case "场景列表":
             break

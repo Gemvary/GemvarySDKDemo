@@ -7,30 +7,35 @@
 
 import GRDB
 
-class Room: NSObject, Codable {
+/// 房间信息类
+struct Room: Codable {
     /// 设置rowID
     var id: Int64?
-    /// 房间名称
-    var room_name: String?
-    /// icon路径
-    var room_backgroup: String?
+    /// 房间ID
+    var room_id: Int?
     /// 房间类型
     var room_class_type: Int?
-    
+    /// 房间名称
+    var room_name: String?
+    /// 房间背景图
+    var room_backgroup: String?
+        
     /// 数据库表行名
     private enum Columns: String, CodingKey, ColumnExpression {
         /// 设置rowID
         case id
-        /// 房间名称
-        case room_name
-        /// 图片
-        case room_backgroup
+        /// 房间ID
+        case room_id
         /// 房间类型
         case room_class_type
+        /// 房间名称
+        case room_name
+        /// 房间背景图
+        case room_backgroup
     }
     
     /// 设置rowID
-    func didInsert(with rowID: Int64, for column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
         self.id = rowID
     }
     
@@ -38,34 +43,47 @@ class Room: NSObject, Codable {
     static let persistenceConflictPolicy = PersistenceConflictPolicy(insert: Database.ConflictResolution.replace, update: Database.ConflictResolution.replace)
 }
 
-/// 房间的curd
+/// 实现CURD功能
 extension Room: MutablePersistableRecord, FetchableRecord {
     /// 获取数据库对象
     private static let dbPool: DatabasePool = SmartHomeDataBase.dbPool
     
     /// 创建数据库表
     private static func createTable() -> Void {
-        try! Room.dbPool.write { (db) -> Void in
-            // 判断是否存在数据库
+        try! self.dbPool.write({ (db) -> Void in
             if try db.tableExists(SmartHomeTable.room) {
                 //swiftDebug("表已经存在")
+                                
+                // 新增数据库字段
+                let columns: [ColumnInfo] = try db.columns(in: SmartHomeTable.room)
+                // 遍历判断是否存在 room_id行
+                let room_id = columns.contains { (columns) -> Bool in
+                    return columns.name == Columns.room_id.rawValue
+                }
+                if room_id == false {
+                    try db.alter(table: SmartHomeTable.room, body: { (t) in
+                        t.add(column: Columns.room_id.rawValue, Database.ColumnType.integer)
+                    })
+                }
+                
                 return
             }
             // 创建数据库
             try db.create(table: SmartHomeTable.room, temporary: false, ifNotExists: true, body: { (t) in
-                /// 自增ID
+                // 自增ID
                 t.autoIncrementedPrimaryKey(Columns.id.rawValue)
-                /// 房间名称
-                t.column(Columns.room_name.rawValue, Database.ColumnType.text)
-                /// 图片路径
-                t.column(Columns.room_backgroup.rawValue, Database.ColumnType.text)
-                /// 房间类型
+                // 房间ID
+                t.column(Columns.room_id.rawValue, Database.ColumnType.integer)
+                // 房间类型
                 t.column(Columns.room_class_type.rawValue, Database.ColumnType.integer)
+                // 房间名称
+                t.column(Columns.room_name.rawValue, Database.ColumnType.text)
+                // 房间背景图
+                t.column(Columns.room_backgroup.rawValue, Database.ColumnType.text)
             })
-        }
+        })
     }
     
-    //MARK: 插入
     /// 插入单个房间数据
     static func insert(room: Room) -> Void {
         // 查询房间
@@ -97,28 +115,10 @@ extension Room: MutablePersistableRecord, FetchableRecord {
         }
     }
     
-    //MARK: 查询房间
-    /// 查询所有
-    static func queryAll() -> [Room] {
-        Room.createTable()
-        return try! Room.dbPool.read { (db) -> [Room] in
-            // 插入到数据库
-            return try Room.fetchAll(db)
-        }
-    }
-    
-    /// 房间名字查询房间
-    static func query(roomName: String) -> Room? {
-        Room.createTable()
-        return try! Room.dbPool.unsafeRead({ (db) -> Room? in
-            return try Room.filter(Column(Columns.room_name.rawValue) == roomName).fetchOne(db)
-        })
-    }
-    
     /// 根据设备查询设备
     static func query(room: Room) -> Room? {
         Room.createTable()
-        return try! Room.dbPool.unsafeRead({ (db) -> Room? in
+        return try! Room.dbPool.read({ (db) -> Room? in
             return try Room
                 .filter(Column(Columns.room_name.rawValue) == room.room_name)
                 .filter(Column(Columns.room_class_type.rawValue) == room.room_class_type)
@@ -127,8 +127,16 @@ extension Room: MutablePersistableRecord, FetchableRecord {
         })
     }
     
-    
-    //MARK: 更新
+    /// 查询所有房间
+    static func queryAll() -> [Room] {
+        // 创建数据库表
+        Room.createTable()
+        // 查询数据
+        return try! Room.dbPool.unsafeRead({ (db) -> [Room] in
+            return try Room.fetchAll(db)
+        })
+    }
+            
     /// 更新房间
     static func update(room: Room) -> Void {
         // 创建数据库
@@ -145,15 +153,14 @@ extension Room: MutablePersistableRecord, FetchableRecord {
         })
     }
     
-    //MARK: 删除
-    /// 根据房间名称删除房间
-    static func delete(roomName: String) -> Void {
-        // 查询房间
-        guard let room: Room = Room.query(roomName: roomName) else {
-            return
-        }
-        // 删除房间
-        Room.delete(room: room)
+    /// 房间名字查询房间
+    static func query(roomName: String) -> Room? {
+        Room.createTable()
+        return try! Room.dbPool.read({ (db) -> Room? in
+            return try Room
+                .filter(Column(Columns.room_name.rawValue) == roomName)
+                .fetchOne(db)
+        })
     }
     
     /// 删除某一房间
@@ -170,6 +177,16 @@ extension Room: MutablePersistableRecord, FetchableRecord {
                 return Database.TransactionCompletion.rollback
             }
         })
+    }
+    
+    /// 根据房间名称删除房间
+    static func delete(roomName: String) -> Void {
+        // 查询房间
+        guard let room: Room = Room.query(roomName: roomName) else {
+            return
+        }
+        // 删除房间
+        Room.delete(room: room)
     }
     
     /// 删除所有房间

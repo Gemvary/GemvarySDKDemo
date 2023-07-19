@@ -81,7 +81,7 @@ class SmartLinkageManagerHandler: NSObject {
 }
 
 /// 联动管理 添加
-class SmartLinkageManagerAddRecv: NSObject, Codable {
+struct SmartLinkageManagerAddRecv: Codable {
     /// 消息类型 smart_linkage_manager
     var msg_type: String?
     /// 命令 add
@@ -107,19 +107,19 @@ class SmartLinkageManagerAddRecv: NSObject, Codable {
     
     /// 插入联动
     func insertSmartLinkage() -> Void {
-        let smartLinkage = SmartLinkage()
+        var smartLinkage = SmartLinkage()
         smartLinkage.linkage_name = self.linkage_name
         smartLinkage.state = self.state
         smartLinkage.conditions = self.conditions
-        smartLinkage.content = ""
+        //smartLinkage.content = ""
         smartLinkage.retrigger_time = self.retrigger_time
-        smartLinkage.linkage_id = 0
+        //smartLinkage.linkage_id = 0
         SmartLinkage.insert(smartLinkage: smartLinkage)
     }
 }
 
 /// 联动管理 删除
-class SmartLinkageManagerDeleteRecv: NSObject, Codable {
+struct SmartLinkageManagerDeleteRecv: Codable {
     /// 消息类型 smart_linkage_manager
     var msg_type: String?
     /// 命令 delete
@@ -144,7 +144,7 @@ class SmartLinkageManagerDeleteRecv: NSObject, Codable {
 }
 
 /// 联动管理 激活
-class SmartLinkageManagerStartRecv: NSObject, Codable {
+struct SmartLinkageManagerStartRecv: Codable {
     /// 消息类型 smart_linkage_manager
     var msg_type: String?
     /// 命令 start
@@ -171,7 +171,7 @@ class SmartLinkageManagerStartRecv: NSObject, Codable {
 }
 
 /// 联动管理 失效
-class SmartLinkageManagerStopRecv: NSObject, Codable {
+struct SmartLinkageManagerStopRecv: Codable {
     /// 消息类型 smart_linkage_manager
     var msg_type: String?
     /// 命令 stop

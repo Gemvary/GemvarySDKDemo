@@ -82,7 +82,7 @@ class RoomManagerAddRecv: NSObject, Codable {
     
     /// 插入到数据库
     func insertRoom() -> Void {
-        let room = Room()        
+        var room = Room()        
         room.room_name = self.room_name
         room.room_backgroup = self.room_backgroup
         room.room_class_type = self.room_class_type
