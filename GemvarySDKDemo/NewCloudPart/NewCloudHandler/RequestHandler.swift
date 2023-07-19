@@ -126,14 +126,8 @@ class RequestHandler: NSObject {
     //MARK: - 网关代理请求
     /// 网关代理请求
     static func iotGatewayProxy(data: String, successCallback: ((String?) -> Void)? = nil, failedCallback: ((String?) -> Void)? = nil) -> Void {
-        guard ReachableTool.share.reachable == true else {
-            swiftDebug("当前网络不佳")
-            failedCallback?("")
-            return
-        }
         // 判断空间是否为空
         if let accountInfo = AccountInfo.queryNow(), let spaceId = accountInfo.spaceID {
-            // ca24923fd2ac41bd8beb7d3a8df4f05f
             swiftDebug("选择当前空间", spaceId)
             // 发送固定家庭ID数据
             self.iotGatewayProxy(spaceId: spaceId, data: data) { (success) in
@@ -153,11 +147,6 @@ class RequestHandler: NSObject {
 
     /// 根据空间ID发送数据
     static func iotGatewayProxy(spaceId: String, data: String, successCallback: ((String?) -> Void)? = nil, failedCallback: ((String?) -> Void)? = nil) -> Void {
-        guard ReachableTool.share.reachable == true else {
-            swiftDebug("当前网络不佳")
-            failedCallback?("")
-            return
-        }
         RequestAPI.iotGatewayProxy(spaceId: spaceId, data: data) { (status, object) in
             
             if object is Error {

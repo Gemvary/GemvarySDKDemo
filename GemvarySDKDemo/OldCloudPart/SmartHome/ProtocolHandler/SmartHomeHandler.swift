@@ -96,54 +96,21 @@ class SmartHomeHandler: NSObject {
     /// 智能家居发送数据
     @objc public static func sendData(msg: String, callback: (([String : Any]? , Error?) -> Void)? = nil) -> Void {
         
-//        guard let accountInfo = AccountInfo.queryNow() else {
-//            swiftDebug("当前账户信息为空")
-//            return
-//        }
-        
-//        if let smartDevCode = accountInfo.smartDevCode, smartDevCode != "" {
-//            // 发送旧款主机
-//            // websocket
-//            WebSocketTool.share.sendData(sendMag: msg) { object, error in
-//                swiftDebug("")
-//                guard let object = object, let dict = JSONTool.translationJsonToDic(from: object) else {
-//                    swiftDebug("转换字典失败")
-//                    return
-//                }
-//                callback!(dict, error)
-//            }
-//        }
-        
-        // 新云端V3收发数据处理
-        //if let spaceID = accountInfo.spaceID, spaceID != "" {
-            // 发送空间数据
-            RequestHandler.iotGatewayProxy(data: msg) { (success) in
-                swiftDebug("发送数据 成功", success as Any)
-                // 处理解析后的数据
-                guard let jsonDic = JSONTool.translationJsonToDic(from: success!) else {
-                    swiftDebug("转换字段数据失败")
-                    return
-                }
-                // 解析数据
-                ProtocolHandler.jsonStrData(jsonDic: jsonDic)
-                callback!(jsonDic, nil)
-            } failedCallback: { (failed) in
-                swiftDebug("发送数据 失败", failed as Any)
-                callback!([String: Any](), nil)
+        // 发送空间数据
+        RequestHandler.iotGatewayProxy(data: msg) { (success) in
+            swiftDebug("发送数据 成功", success as Any)
+            // 处理解析后的数据
+            guard let jsonDic = JSONTool.translationJsonToDic(from: success!) else {
+                swiftDebug("转换字段数据失败")
+                return
             }
-        //}
-                
-        // 局域网收发数据
-//        if let ip: String = self.deviceInfo["ip"] as? String, ip != "" {
-//            // lan device
-//            LanLibService.share.sendDataToGateway(json: msg) { object in
-//                guard let content = object, let dic = JSONTool.translationJsonToDic(from: content) else {
-//                    swiftDebug("转换字典失败")
-//                    return
-//                }
-//                callback?(dic, nil)
-//            }
-//        }
+            // 解析数据
+            ProtocolHandler.jsonStrData(jsonDic: jsonDic)
+            callback!(jsonDic, nil)
+        } failedCallback: { (failed) in
+            swiftDebug("发送数据 失败", failed as Any)
+            callback!([String: Any](), nil)
+        }
     }
     
     /// 接收智能家居数据

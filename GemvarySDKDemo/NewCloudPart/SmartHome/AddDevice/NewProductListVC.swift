@@ -38,7 +38,8 @@ class NewProductListVC: UIViewController {
             make.edges.equalToSuperview()
         }
         
-        self.dataList = DeviceClass.queryAll()
+        self.dataList = DeviceClass.query(gatewayType: GatewayType.zigbee)
+        swiftDebug("", self.dataList)
     }
     
 }
@@ -100,7 +101,7 @@ class NewProductCell: UITableViewCell {
         return label
     }()
     
-    private var describeLabel: UILabel = {
+    private var brandLabel: UILabel = {
         let label = UILabel()
         return label
     }()
@@ -116,6 +117,9 @@ class NewProductCell: UITableViewCell {
             if let gateway_type = self.deviceClass.gateway_type {
                 self.gatewayTypeLabel.text = "网关类型:\(gateway_type)"
             }
+            if let dev_brand = self.deviceClass.dev_brand {
+                self.brandLabel.text = "品牌:\(dev_brand)"
+            }
         }
     }
     
@@ -125,6 +129,7 @@ class NewProductCell: UITableViewCell {
         self.contentView.addSubview(self.nameLabel)
         self.contentView.addSubview(self.typeLabel)
         self.contentView.addSubview(self.gatewayTypeLabel)
+        self.contentView.addSubview(self.brandLabel)
         
         self.nameLabel.snp.makeConstraints { make in
             make.left.equalToSuperview()
@@ -137,6 +142,10 @@ class NewProductCell: UITableViewCell {
         self.gatewayTypeLabel.snp.makeConstraints { make in
             make.left.equalToSuperview()
             make.top.equalTo(self.typeLabel.snp.bottom)
+        }
+        self.brandLabel.snp.makeConstraints { make in
+            make.left.equalToSuperview()
+            make.top.equalTo(self.gatewayTypeLabel.snp.bottom)
         }
     }
     

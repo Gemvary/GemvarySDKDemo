@@ -2,7 +2,7 @@
 //  SmartSDKHandler.swift
 //  Gem_Home
 //
-//  Created by SongMenglong on 2020/12/26.
+//  Created by Gemvary Apple on 2020/12/26.
 //  Copyright © 2020 gemvary. All rights reserved.
 //
 

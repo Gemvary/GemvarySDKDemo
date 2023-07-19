@@ -25,6 +25,12 @@ struct ProtocolHandler {
             swiftDebug("转换model失败")
             return
         }
+        
+        guard let jsonStr = JSONTool.translationObjToJson(from: jsonDic) else {
+            swiftDebug("设备上报信息 数据转字符串失败")
+            return
+        }
+        
         // 处理智能家居返回的信息
         switch msgReceive.msg_type {
         case MsgType.device_frontdisplay_manager:
@@ -48,7 +54,8 @@ struct ProtocolHandler {
             DeviceClassInfoHandler.handleData(msg: msgReceive, info: jsonDic)
             break
         case MsgType.new_device_manager: // 新设备入网上报 通知客户端
-            //NewDeviceManagerHandler.handleData(msg: msgReceive, info: jsonDic)
+            // 发送通知给添加设备页面
+            NotificationCenter.default.post(name: NSNotification.Name.new_device_manager, object: nil, userInfo: ["data":jsonStr])
             break
         case MsgType.device_online_manager: // 设备在线管理
             //DeviceOnlineManagerHandle.handleData(msg: msgReceive, info: jsonDic)

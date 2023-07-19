@@ -2,7 +2,7 @@
 //  HotelHandler.swift
 //  Gem_Home
 //
-//  Created by SongMengLong on 2023/4/7.
+//  Created by Gemvary Apple on 2023/4/7.
 //
 
 import GemvaryNetworkSDK
