@@ -62,16 +62,59 @@ class NewAddDeviceVC: UIViewController {
         }
         
         NotificationCenter.default.addObserver(self, selector: #selector(newDeviceManagerUpHandler(noti:)), name: NSNotification.Name.new_device_manager, object: nil)
-        
+
+        NotificationCenter.default.addObserver(self, selector: #selector(deviceJoinControlHandler(noti:)), name: NSNotification.Name.device_join_control, object: nil)
+
     }
         
     /// 新设备上报通知处理
     @objc func newDeviceManagerUpHandler(noti: Notification) -> Void {
         ///
         if let userinfo = noti.userInfo {
-           swiftDebug("", userinfo)
+           swiftDebug("解析数据", userinfo)
+            
+            guard let dataJson: String = userinfo["data"] as? String else {
+                swiftDebug("")
+                return
+            }
+            guard let dataDict = JSONTool.translationJsonToDic(from: dataJson) else {
+                swiftDebug("")
+                return
+            }
+            
+            guard let recv = try? ModelDecoder.decode(NewDeviceManagerRecv.self, param: dataDict) else {
+                swiftDebug("NewDeviceManagerRecv 转换Model失败")
+                return
+            }
+            
+            
+            /**
+             {"msg_type":"new_device_manager","command":"up","from_role":"business","from_account":"84107890870c182608cf",
+                //"devices":[{"alloc_room":0,"new_dev_id":0,"dev_addr":"_wQBAITz65whWQAAAAAAAA","riu_id":1,"gateway_type":"wifi_Module","dev_class_type":"lifesmart_repeater",
+                //"dev_net_addr":"{\"userid\":\"7707463\",\"usertoken\":\"4Is3Xzd9pyfVJ4JuuO9zag\",\"agt\":\"_wQBAITz65whWQAAAAAAAA\",\"me\":\"0011\"}","dev_uptype":100,
+                //"brand":"LifeSmart","host_mac":"84107890870c182608cf","dev_key":1,"dev_state":"{\"status\":\"off\"}"}]}
+             */
+            
+            // 跳转到添加到房间页面
+            
+            let newAddToRoomVC = NewAddToRoomVC()
+            
+            self.navigationController?.pushViewController(newAddToRoomVC, animated: true)
+            
+            
+            
         }
     }
+    
+    /// 设备添加返回
+    @objc func deviceJoinControlHandler(noti: Notification) -> Void {
+        
+        // 停止入网
+        self.sendSearchDevice(command: false)
+    }
+    
+    
+    
     
 }
 
@@ -109,6 +152,10 @@ extension NewAddDeviceVC: UITableViewDelegate, UITableViewDataSource {
             }
             break
         case "添加Wi-Fi网关设备":
+            let newAddToRoomVC = NewAddToRoomVC()
+            
+            self.navigationController?.pushViewController(newAddToRoomVC, animated: true)
+            
             break
         default:
             break
@@ -215,7 +262,6 @@ extension NewAddDeviceVC {
             return
         }
         
-        
         var sendJSON = [
             "gid": gid,
             "product_id": "product_id",
@@ -242,12 +288,24 @@ extension NewAddDeviceVC {
     }
     
     /// 注册设备
-    private func massProdAddDevice() -> Void {
+    private func massProdAddDevice(devAddr: String) -> Void {
+        
+        guard let accountInfo = AccountInfo.queryNow(), let spaceID = accountInfo.spaceID else {
+            swiftDebug("当前空间ID为空")
+            return
+        }
+        
+        guard let productId = self.deviceClass.id else {
+            swiftDebug("")
+            return
+        }
+        
+        
         // 注册设备
-        MassProdHandler.iotMassProdAddDevice(spaceId: "", devAddr: "", manufacturerId: "", productId: "", riu_id: 0) { success in
-            
+        MassProdHandler.iotMassProdAddDevice(spaceId: spaceID, devAddr: devAddr, manufacturerId: "GEMVARY", productId: "\(productId)", riu_id: 0) { success in
+                swiftDebug("设备注册成功")
         } failedCallback: { failed in
-            
+            swiftDebug("设备注册失败")
         }
         
         
@@ -293,10 +351,44 @@ extension NewAddDeviceVC {
      dev_class_type:dev_class_type,
      riu_id:riu_id,
      host_mac:host_mac
-     
      */
     
-    
+    /// 设备检查
+    private func devCheck() -> Void {
+        guard let accountInfo = AccountInfo.queryNow(), let account = accountInfo.account else {
+            return
+        }
+        guard let gid = self.hostDevice.gid else {
+            return
+        }
+        guard let groupId = self.hostDevice.group_id else {
+            return
+        }
+        
+        var sendData = [
+            "msg_type": "device_manager",
+            "command": "dev_check",
+            "from_role": "phone",
+            "from_account": account,
+            "gid": gid,
+            "dev_addr":"dev_addr",
+            "dev_class_type":"dev_class_type",
+            "riu_id":"riu_id",
+            "host_mac":"host_mac"
+        ]
+        
+        guard let sendJson = JSONTool.translationObjToJson(from: sendData) else {
+            swiftDebug("转换字符串失败")
+            return
+        }
+        swiftDebug("发送智能家居数据:: ", sendData)
+        // 发送智能家居数据
+        SmartHomeHandler.sendData(msg: sendJson) { object, error in
+            swiftDebug("返回数据内容信息", object as Any, error as Any)
+        }
+                     
+    }
+        
 }
 
 /// HeaderView
@@ -331,4 +423,100 @@ class NewAddDeviceHeaderView: UITableViewHeaderFooterView {
         fatalError("init(coder:) has not been implemented")
     }
     
+}
+
+
+/// 新设备类型信息上报
+struct NewDeviceManagerRecv: Codable {
+    /// 消息类型
+    var msg_type: String?
+    /// 命令
+    var command: String?
+    /// 角色
+    var from_role: String?
+    /// 账号
+    var from_account: String?
+    /// 设备信息
+    var devices: [Device]? //[NewDevice]?
+}
+
+/// 新设备信息内容
+struct NewDevice: Codable {
+    /// 是否已经添加
+    var alloc_room: Int?
+    /// 新设备ID
+    var new_dev_id: Int?
+    /// 设备地址
+    var dev_addr: String?
+    /// 网关类型
+    var riu_id: Int?
+    /// 设备类型
+    var dev_class_type: String?
+    /// 网络设备地址
+    var dev_net_addr: String?
+    /// 设备私有类型
+    var dev_uptype: Int?
+    /// 品牌
+    var brand: String?
+    /// 设备key
+    var dev_key: Int?
+    /// 设备状态
+    var dev_state: String?
+    /// 房间
+    var room_name: String?
+    /// 设备名字
+    var dev_name: String?
+    
+    var host_mac: String?
+    /// 临时保存数据
+    var from_account: String?
+    
+    
+    /// 更新设备信息
+    func update() -> Void {
+        guard let dev_addr = self.dev_addr else {
+            swiftDebug("新设备上报 更新 当前设备的地址为空")
+            return
+        }
+        if let room_name = self.room_name, let dev_name = self.dev_name, var device = Device.query(devName: dev_name, roomName: room_name) {
+            // 通过设备名 房间名 查询设备并更新
+            device.riu_id = self.riu_id
+            device.dev_net_addr = self.dev_net_addr
+            device.dev_uptype = self.dev_uptype
+            device.brand = self.brand
+            device.dev_state = self.dev_state
+            device.duration = 1
+            device.online = 1 // 设置当前设备状态为在线
+            if let host_mac = self.host_mac, host_mac != "" { // 2022/05/20修改适配
+                device.host_mac = host_mac
+            } else {
+                device.host_mac = self.from_account
+            }
+            Device.update(device: device)
+        } else {
+            // 查询同一地址的设备
+            let devices = Device.query(dev_addr: dev_addr)
+            swiftDebug("设备上报的数据内容赋值: ", devices)
+            // 更新同一地址的所有设备
+            for device in devices {
+                var device = device
+                //device.dev_id = self.new_dev_id
+                device.riu_id = self.riu_id
+                device.dev_net_addr = self.dev_net_addr
+                device.dev_uptype = self.dev_uptype
+                device.brand = self.brand
+                device.dev_state = self.dev_state
+                device.duration = 1
+                device.online = 1 // 设置当前设备状态为在线
+                //device.dev_key = self.dev_key
+                if let host_mac = self.host_mac, host_mac != "" { // 2022/05/20修改适配
+                    device.host_mac = host_mac
+                } else {
+                    device.host_mac = self.from_account
+                }
+                Device.update(device: device)
+            }
+        }
+        
+    }
 }

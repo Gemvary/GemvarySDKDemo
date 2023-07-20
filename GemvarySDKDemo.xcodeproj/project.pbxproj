@@ -16,6 +16,7 @@
 		D85DAACC281915DC001FD99B /* NewZoneListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85DAACB281915DC001FD99B /* NewZoneListVC.swift */; };
 		D85DAACE28191743001FD99B /* NewOwnerRoomListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85DAACD28191743001FD99B /* NewOwnerRoomListVC.swift */; };
 		D85DAAD0281A3ACC001FD99B /* NewNodeDeviceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85DAACF281A3ACC001FD99B /* NewNodeDeviceVC.swift */; };
+		D8795F0E2A68CEFB006740B1 /* NewAddToRoomVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8795F0D2A68CEFB006740B1 /* NewAddToRoomVC.swift */; };
 		D8C0F4712A5FE97A00DFF258 /* SmartSDKHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8C0F4702A5FE97900DFF258 /* SmartSDKHandler.swift */; };
 		D8C0F4732A5FF80700DFF258 /* NewSpaceListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8C0F4722A5FF80700DFF258 /* NewSpaceListVC.swift */; };
 		D8C0F4752A5FFAC200DFF258 /* NewHostDeviceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8C0F4742A5FFAC200DFF258 /* NewHostDeviceVC.swift */; };
@@ -179,6 +180,7 @@
 		D85DAACD28191743001FD99B /* NewOwnerRoomListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewOwnerRoomListVC.swift; sourceTree = "<group>"; };
 		D85DAACF281A3ACC001FD99B /* NewNodeDeviceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewNodeDeviceVC.swift; sourceTree = "<group>"; };
 		D85DAAD1281A60EC001FD99B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		D8795F0D2A68CEFB006740B1 /* NewAddToRoomVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAddToRoomVC.swift; sourceTree = "<group>"; };
 		D8C0F4702A5FE97900DFF258 /* SmartSDKHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmartSDKHandler.swift; sourceTree = "<group>"; };
 		D8C0F4722A5FF80700DFF258 /* NewSpaceListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSpaceListVC.swift; sourceTree = "<group>"; };
 		D8C0F4742A5FFAC200DFF258 /* NewHostDeviceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHostDeviceVC.swift; sourceTree = "<group>"; };
@@ -387,6 +389,7 @@
 			children = (
 				D8C0F4782A611E0B00DFF258 /* NewProductListVC.swift */,
 				D8C0F47A2A611F9400DFF258 /* NewAddDeviceVC.swift */,
+				D8795F0D2A68CEFB006740B1 /* NewAddToRoomVC.swift */,
 			);
 			path = AddDevice;
 			sourceTree = "<group>";
@@ -1068,6 +1071,7 @@
 				E2D30F872682CEA80080002B /* PropertyListVC.swift in Sources */,
 				E278E99426C6488200B0914F /* Zone.swift in Sources */,
 				E2D5D2AF26F3280E006D0EF5 /* Device.swift in Sources */,
+				D8795F0E2A68CEFB006740B1 /* NewAddToRoomVC.swift in Sources */,
 				D8E0CC4F280FF0170070391D /* LifeSmartNetHandler.swift in Sources */,
 				D8E0CC3C280FE2580070391D /* NewPropertyWorkHandler.swift in Sources */,
 				D81832BB280D6594006F50DE /* CloudSelectVC.swift in Sources */,

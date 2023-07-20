@@ -98,13 +98,9 @@ struct ProtocolHandler {
             self.authorityManagerBlock?(msgReceive, jsonDic)
             break
         case MsgType.device_join_control: // 设备入网 刷新数据
+            // 上报设备入网信息
+            NotificationCenter.default.post(name: NSNotification.Name.device_join_control, object: nil, userInfo: ["data":jsonStr])
 
-//            guard let jsonStr = JSONTool.translationObjToJson(from: jsonDic) else {
-//                swiftDebug("设备上报信息 数据转字符串失败")
-//                return
-//            }
-            // 发送订阅消息
-//            NotificationCenter.default.post(name: NSNotification.Name(rawValue: WeexNotiName.devUpdate), object: nil, userInfo: ["data": jsonStr])
             break
         default:
             swiftDebug("其他消息类型", msgReceive.msg_type as Any)

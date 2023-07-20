@@ -61,5 +61,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 /// 新增通知名字
 extension Notification.Name {
     ///  新设备上报
-    public static let new_device_manager = Notification.Name(rawValue: "new_device_manager")    
+    public static let new_device_manager = Notification.Name(rawValue: "new_device_manager")
+    /// 设备入网
+    public static let device_join_control = Notification.Name(rawValue: "new_device_manager")
+    
 }
