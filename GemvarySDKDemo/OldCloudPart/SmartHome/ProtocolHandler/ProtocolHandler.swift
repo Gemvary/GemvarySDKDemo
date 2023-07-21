@@ -99,7 +99,7 @@ struct ProtocolHandler {
             break
         case MsgType.device_join_control: // 设备入网 刷新数据
             // 上报设备入网信息
-            NotificationCenter.default.post(name: NSNotification.Name.device_join_control, object: nil, userInfo: ["data":jsonStr])
+            //NotificationCenter.default.post(name: NSNotification.Name.device_join_control, object: nil, userInfo: ["data":jsonStr])
 
             break
         default:

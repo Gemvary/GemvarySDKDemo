@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import GemvarySmartHomeSDK
 
 /// 新云端Tabbar
 class NewMianHomeVC: UITabBarController {
@@ -39,10 +40,15 @@ class NewMianHomeVC: UITabBarController {
             newSmartHomeNavi,
             newCloudAPITestNavi
         ]
+        // 初始化智能家居
+        SmartHomeHandler.initSmartHome()
+        if let accountInfo = AccountInfo.queryNow(), let account = accountInfo.account {
+            // 初始化局域网
+            SmartHomeManager.initSmartHome(debug: false, account: account)
+        }
         
         // WebSocket开始连接
-        WebSocketHandler.setupWebSocket()   
-        
+        WebSocketHandler.setupWebSocket()           
     }
     
 

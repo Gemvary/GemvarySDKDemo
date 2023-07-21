@@ -29,17 +29,12 @@ class NewAddDeviceVC: UIViewController {
     
     private var dataList: [String] = [
         "添加Zigbee节点设备",
-        "添加Wi-Fi网关设备",
+        "添加Wi-Fi网关设备", // 扫描局域网添加主机
     ]
     /// 设备类型
     var deviceClass: DeviceClass = DeviceClass()
     /// 默认主机设备（当前默认第一个主机设备为hostdevice）
-    private var hostDevice: Device = Device() {
-        didSet {
-            
-        }
-    }
-    
+    private var hostDevice: Device = Device()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,6 +52,7 @@ class NewAddDeviceVC: UIViewController {
         if hostDevices.count <= 0 {
             ProgressHUD.showText("主机设备个数为0")
         }
+        // 默认选择第一个主机
         if let first = hostDevices.first {
             self.hostDevice = first
         }
@@ -74,11 +70,11 @@ class NewAddDeviceVC: UIViewController {
            swiftDebug("解析数据", userinfo)
             
             guard let dataJson: String = userinfo["data"] as? String else {
-                swiftDebug("")
+                swiftDebug("解析数据失败")
                 return
             }
             guard let dataDict = JSONTool.translationJsonToDic(from: dataJson) else {
-                swiftDebug("")
+                swiftDebug("解析数据失败")
                 return
             }
             
@@ -97,11 +93,13 @@ class NewAddDeviceVC: UIViewController {
             
             // 跳转到添加到房间页面
             
-            let newAddToRoomVC = NewAddToRoomVC()
+//            let newAddToRoomVC = NewAddToRoomVC()
             
-            self.navigationController?.pushViewController(newAddToRoomVC, animated: true)
+//            self.navigationController?.pushViewController(newAddToRoomVC, animated: true)
             
-            
+            /*
+             {\"msg_type\":\"new_device_manager\",\"command\":\"up\",\"from_role\":\"business\",\"from_account\":\"259173ce40164413\",\"dev_fw_version\":\"{\\\"dev_fw_version\\\":\\\"15\\\"}\",\"devices\":[{\"alloc_room\":0,\"new_dev_id\":0,\"dev_addr\":\"847127fffedb1e3e\",\"riu_id\":3,\"gateway_type\":\"zigbee\",\"dev_class_type\":\"gem_cube\",\"dev_net_addr\":\"c8c1\",\"dev_uptype\":83,\"brand\":\"gemvary.m9\",\"host_mac\":\"259173ce40164413\",\"dev_key\":1,\"dev_state\":\"{\\\"status\\\":\\\"on\\\",\\\"sub_devices\\\":[{\\\"dev_class_type\\\":\\\"light_three\\\",\\\"channel\\\":7,\\\"alloc\\\":0,\\\"id\\\":1},{\\\"dev_class_type\\\":\\\"scene_m9_panel6\\\",\\\"channel\\\":63,\\\"alloc\\\":0,\\\"id\\\":2}]}\"}]}
+             */
             
         }
     }
@@ -153,7 +151,8 @@ extension NewAddDeviceVC: UITableViewDelegate, UITableViewDataSource {
             break
         case "添加Wi-Fi网关设备":
             let newAddToRoomVC = NewAddToRoomVC()
-            
+            newAddToRoomVC.deviceClass = self.deviceClass
+            //newAddToRoomVC.dataList = []
             self.navigationController?.pushViewController(newAddToRoomVC, animated: true)
             
             break
@@ -212,6 +211,12 @@ extension NewAddDeviceVC {
             swiftDebug("dev_uptype为空")
             return
         }
+        /**
+         {\"host_mac\":\"259173ce40164413\",\"msg_type\":\"device_join_control\",\"command\":\"allow\",\"from_role\":\"phone\",\"from_account\":\"15989760200\",\"dev_class_type\":\"smoke\",\"gateway_type\":\"zigbee\",\"dev_sn\":\"\",\"riu_id\":3,\"brand\":\"gemvary.mlk\",\"dev_uptype\":0}"]
+         
+         ["command": "stop", "riu_id": 3, "dev_sn": "", "gateway_type": "zigbee", "dev_uptype": 0, "brand": "gemvary.bnd", "host_mac": "259173ce40164413", "msg_type": "device_join_control", "from_role": "phone", "from_account": "15989760200", "dev_class_type": "smoke"]
+         
+         */
         let sendData: [String: Any] = [
             "host_mac": host_mac,
             "msg_type" : MsgType.device_join_control,
