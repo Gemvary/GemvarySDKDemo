@@ -32,7 +32,21 @@ class NewAddDeviceVC: UIViewController {
         "添加Wi-Fi网关设备", // 扫描局域网添加主机
     ]
     /// 设备类型
-    var deviceClass: DeviceClass = DeviceClass()
+    var deviceClass: DeviceClass = DeviceClass() {
+        didSet {
+            guard let dev_class_type = self.deviceClass.dev_class_type else {
+                swiftDebug("当前产品的设备类型为空")
+                return
+            }
+            if dev_class_type.contains("gateway") {
+                // 主机设备
+                
+            } else {
+                
+            }
+            
+        }
+    }
     /// 默认主机设备（当前默认第一个主机设备为hostdevice）
     private var hostDevice: Device = Device()
     
@@ -40,7 +54,7 @@ class NewAddDeviceVC: UIViewController {
         super.viewDidLoad()
         
         self.title = "添加设备"
-
+        
         self.view.addSubview(self.tableView)
         self.tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -83,6 +97,12 @@ class NewAddDeviceVC: UIViewController {
                 return
             }
             
+            guard recv.msg_type == MsgType.new_device_manager,
+                  recv.command == "up",
+                  let deviceList = recv.devices else {
+                swiftDebug("消息类型或设备内容不存在")
+                return
+            }
             
             /**
              {"msg_type":"new_device_manager","command":"up","from_role":"business","from_account":"84107890870c182608cf",
@@ -92,27 +112,19 @@ class NewAddDeviceVC: UIViewController {
              */
             
             // 跳转到添加到房间页面
-            
-//            let newAddToRoomVC = NewAddToRoomVC()
-            
-//            self.navigationController?.pushViewController(newAddToRoomVC, animated: true)
-            
-            /*
-             {\"msg_type\":\"new_device_manager\",\"command\":\"up\",\"from_role\":\"business\",\"from_account\":\"259173ce40164413\",\"dev_fw_version\":\"{\\\"dev_fw_version\\\":\\\"15\\\"}\",\"devices\":[{\"alloc_room\":0,\"new_dev_id\":0,\"dev_addr\":\"847127fffedb1e3e\",\"riu_id\":3,\"gateway_type\":\"zigbee\",\"dev_class_type\":\"gem_cube\",\"dev_net_addr\":\"c8c1\",\"dev_uptype\":83,\"brand\":\"gemvary.m9\",\"host_mac\":\"259173ce40164413\",\"dev_key\":1,\"dev_state\":\"{\\\"status\\\":\\\"on\\\",\\\"sub_devices\\\":[{\\\"dev_class_type\\\":\\\"light_three\\\",\\\"channel\\\":7,\\\"alloc\\\":0,\\\"id\\\":1},{\\\"dev_class_type\\\":\\\"scene_m9_panel6\\\",\\\"channel\\\":63,\\\"alloc\\\":0,\\\"id\\\":2}]}\"}]}
-             */
-            
+            let newAddToRoomVC = NewAddToRoomVC()
+            newAddToRoomVC.deviceClass = self.deviceClass
+            newAddToRoomVC.dataList = deviceList
+            newAddToRoomVC.hostDevice = self.hostDevice
+            self.navigationController?.pushViewController(newAddToRoomVC, animated: true)            
         }
     }
     
     /// 设备添加返回
     @objc func deviceJoinControlHandler(noti: Notification) -> Void {
-        
         // 停止入网
         self.sendSearchDevice(command: false)
     }
-    
-    
-    
     
 }
 
@@ -215,7 +227,6 @@ extension NewAddDeviceVC {
          {\"host_mac\":\"259173ce40164413\",\"msg_type\":\"device_join_control\",\"command\":\"allow\",\"from_role\":\"phone\",\"from_account\":\"15989760200\",\"dev_class_type\":\"smoke\",\"gateway_type\":\"zigbee\",\"dev_sn\":\"\",\"riu_id\":3,\"brand\":\"gemvary.mlk\",\"dev_uptype\":0}"]
          
          ["command": "stop", "riu_id": 3, "dev_sn": "", "gateway_type": "zigbee", "dev_uptype": 0, "brand": "gemvary.bnd", "host_mac": "259173ce40164413", "msg_type": "device_join_control", "from_role": "phone", "from_account": "15989760200", "dev_class_type": "smoke"]
-         
          */
         let sendData: [String: Any] = [
             "host_mac": host_mac,
@@ -250,47 +261,47 @@ extension NewAddDeviceVC {
     }
     
     /// 添加主机设备
-    private func addHostDevice() -> Void {
-        
-    }
+//    private func addHostDevice() -> Void {
+//
+//    }
     
     
     /// 添加设备到空间
-    private func addDeviceToSpace() -> Void {
-        guard let accountInfo = AccountInfo.queryNow(), let account = accountInfo.account else {
-            return
-        }
-        guard let gid = self.hostDevice.gid else {
-            return
-        }
-        guard let groupId = self.hostDevice.group_id else {
-            return
-        }
-        
-        var sendJSON = [
-            "gid": gid,
-            "product_id": "product_id",
-            "group_id": groupId,
-            "msg_type" : MsgType.device_manager,
-            "from_role" : FromRole.phone,
-            "from_account" : account,
-            "riu_id" :  "self.currentDevice.riu_id",
-            "dev_class_type" : "self.currentDevice.dev_class_type", // 当前信息的类型
-            "dev_addr" : "self.currentDevice.dev_addr",
-            "dev_net_addr" : "self.currentDevice.dev_net_addr",
-            "dev_uptype" : "self.currentDevice.dev_uptype",
-            "dev_key" : "self.currentDevice.dev_key",
-            "brand_logo" : "self.deviceIcon",
-            "brand" : "self.currentDevice.brand",
-            "dev_state" : "dev_state",
-            "dev_additional" : "dev_additional",
-            "channel_id": 0,
-            "online": "online",
-            "duration": "duration",
-            "host_mac": "host_mac",
-        ] as [String : Any]
-                        
-    }
+//    private func addDeviceToSpace() -> Void {
+//        guard let accountInfo = AccountInfo.queryNow(), let account = accountInfo.account else {
+//            return
+//        }
+//        guard let gid = self.hostDevice.gid else {
+//            return
+//        }
+//        guard let groupId = self.hostDevice.group_id else {
+//            return
+//        }
+//
+//        var sendJSON = [
+//            "gid": gid,
+//            "product_id": "product_id",
+//            "group_id": groupId,
+//            "msg_type" : MsgType.device_manager,
+//            "from_role" : FromRole.phone,
+//            "from_account" : account,
+//            "riu_id" :  "self.currentDevice.riu_id",
+//            "dev_class_type" : "self.currentDevice.dev_class_type", // 当前信息的类型
+//            "dev_addr" : "self.currentDevice.dev_addr",
+//            "dev_net_addr" : "self.currentDevice.dev_net_addr",
+//            "dev_uptype" : "self.currentDevice.dev_uptype",
+//            "dev_key" : "self.currentDevice.dev_key",
+//            "brand_logo" : "self.deviceIcon",
+//            "brand" : "self.currentDevice.brand",
+//            "dev_state" : "dev_state",
+//            "dev_additional" : "dev_additional",
+//            "channel_id": 0,
+//            "online": "online",
+//            "duration": "duration",
+//            "host_mac": "host_mac",
+//        ] as [String : Any]
+//
+//    }
     
     /// 注册设备
     private func massProdAddDevice(devAddr: String) -> Void {
@@ -301,10 +312,9 @@ extension NewAddDeviceVC {
         }
         
         guard let productId = self.deviceClass.id else {
-            swiftDebug("")
+            swiftDebug("当前设备的产品ID为空")
             return
         }
-        
         
         // 注册设备
         MassProdHandler.iotMassProdAddDevice(spaceId: spaceID, devAddr: devAddr, manufacturerId: "GEMVARY", productId: "\(productId)", riu_id: 0) { success in
@@ -366,20 +376,21 @@ extension NewAddDeviceVC {
         guard let gid = self.hostDevice.gid else {
             return
         }
-        guard let groupId = self.hostDevice.group_id else {
+        guard let groupId = self.hostDevice.group_id, let host_mac = self.hostDevice.host_mac else {
+            swiftDebug("当前主机设备为空")
             return
         }
         
         var sendData = [
-            "msg_type": "device_manager",
+            "msg_type": MsgType.device_manager,
             "command": "dev_check",
-            "from_role": "phone",
+            "from_role": FromRole.phone,
             "from_account": account,
             "gid": gid,
             "dev_addr":"dev_addr",
             "dev_class_type":"dev_class_type",
             "riu_id":"riu_id",
-            "host_mac":"host_mac"
+            "host_mac": host_mac,
         ]
         
         guard let sendJson = JSONTool.translationObjToJson(from: sendData) else {
@@ -442,7 +453,7 @@ struct NewDeviceManagerRecv: Codable {
     /// 账号
     var from_account: String?
     /// 设备信息
-    var devices: [Device]? //[NewDevice]?
+    var devices: [NewDevice]? //[NewDevice]?
 }
 
 /// 新设备信息内容

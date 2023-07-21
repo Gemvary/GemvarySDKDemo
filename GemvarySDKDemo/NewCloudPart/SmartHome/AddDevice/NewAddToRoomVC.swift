@@ -26,7 +26,7 @@ class NewAddToRoomVC: UIViewController {
         return tableView
     }()
     /// 设备列表
-    var dataList: [Device] = [Device]() {
+    var dataList: [NewDevice] = [NewDevice]() {
         didSet {
             self.tableView.reloadData()
         }
@@ -39,7 +39,7 @@ class NewAddToRoomVC: UIViewController {
     }
     
     var hostDevice: Device = Device()
-    var currentDevice: Device = Device() // 默认选中第一个设备
+    private var currentDevice: NewDevice = NewDevice() // 默认选中第一个设备
                     
     
     override func viewDidLoad() {
@@ -52,20 +52,16 @@ class NewAddToRoomVC: UIViewController {
             make.edges.equalToSuperview()
         }
         
-        /// 设备数据
-        let jsonData = "{\"gateway_type\":\"zigbee\",\"host_mac\":\"259173ce40164413\",\"dev_net_addr\":\"f3fe\",\"room_name\":\"默认\",\"dev_addr\":\"ccccccfffe18188a\",\"alloc_room\":1,\"brand\":\"gemvary.mlk\",\"dev_key\":1,\"new_dev_id\":0,\"riu_id\":3,\"dev_name\":\"烟雾传感器1\",\"dev_state\":\"{\\\"status\\\":\\\"on\\\",\\\"value\\\":1}\",\"dev_uptype\":0,\"dev_class_type\":\"smoke\"}"
         
-        guard let jsonDict = JSONTool.translationJsonToDic(from: jsonData) else {
-            swiftDebug("解析数据为空")
-            return
+        if let device = self.dataList.first {
+            // 默认第一个是当前设备
+            self.currentDevice = device
         }
         
-        guard let deviceModel = try? ModelDecoder.decode(Device.self, param: jsonDict) else {
-            swiftDebug("解析数据失败")
-            return
-        }
-        swiftDebug("解析数据内容", deviceModel)
-        self.dataList = [deviceModel]
+        /*
+         {\"msg_type\":\"new_device_manager\",\"command\":\"up\",\"from_role\":\"business\",\"from_account\":\"259173ce40164413\",\"dev_fw_version\":\"{\\\"dev_fw_version\\\":\\\"15\\\"}\",\"devices\":[{\"alloc_room\":0,\"new_dev_id\":0,\"dev_addr\":\"847127fffedb1e3e\",\"riu_id\":3,\"gateway_type\":\"zigbee\",\"dev_class_type\":\"gem_cube\",\"dev_net_addr\":\"c8c1\",\"dev_uptype\":83,\"brand\":\"gemvary.m9\",\"host_mac\":\"259173ce40164413\",\"dev_key\":1,\"dev_state\":\"{\\\"status\\\":\\\"on\\\",\\\"sub_devices\\\":[{\\\"dev_class_type\\\":\\\"light_three\\\",\\\"channel\\\":7,\\\"alloc\\\":0,\\\"id\\\":1},{\\\"dev_class_type\\\":\\\"scene_m9_panel6\\\",\\\"channel\\\":63,\\\"alloc\\\":0,\\\"id\\\":2}]}\"}]}
+         */
+        
     }
     
 }
@@ -109,38 +105,54 @@ extension NewAddToRoomVC: UITableViewDelegate, UITableViewDataSource {
 extension NewAddToRoomVC {
     
     private func addDeviceToRoom() -> Void {
-        
-        guard let gid = self.hostDevice.gid, let host_mac = self.hostDevice.host_mac else {
-            swiftDebug("host_mac为空")
-            return
-        }
+                
         guard let accountInfo = AccountInfo.queryNow(), let account = accountInfo.account else {
             return
         }
+        
         guard let riu_id = self.deviceClass.riu_id,
               let dev_class_type = self.deviceClass.dev_class_type,
               let dev_brand = self.deviceClass.dev_brand,
               let gateway_type = self.deviceClass.gateway_type else {
+            swiftDebug("产品类型的信息为空")
             return
         }
+        
+        guard let gid = self.hostDevice.gid,
+              //let host_mac = self.hostDevice.host_mac,
+              let group_id = self.hostDevice.group_id
+        else {
+            swiftDebug("主机设备的信息为空")
+            return
+        }
+        /// 当前设备信息
+        guard let dev_addr = self.currentDevice.dev_addr,
+              let dev_net_addr = self.currentDevice.dev_net_addr,
+              let dev_uptype = self.currentDevice.dev_uptype, let dev_state = self.currentDevice.dev_state,
+                let host_mac = self.currentDevice.host_mac
+        else {
+            swiftDebug("当前设备信息为空")
+            return
+        }
+        
         
         // 发送数据请求
         let sendData: [String: Any] = [
             "gid":gid, // 主机gid
             "product_id":"9c179ba94e5e42acaa57b82ffc78afea",
-            "group_id":"DA93F72E-B90B-4E93-9860-2CA03DC5500F",
-            "msg_type":"device_manager",
+            "group_id": group_id, //"DA93F72E-B90B-4E93-9860-2CA03DC5500F",
+            "msg_type": MsgType.device_manager,
             "from_role": FromRole.phone,
             "from_account": account,
-            "riu_id":riu_id,
-            "dev_class_type":dev_class_type,
-            "dev_addr":"ccccccfffe18188a",
-            "dev_net_addr":"f3fe",
-            "dev_uptype":0,
+            "riu_id": riu_id,
+            "dev_class_type": dev_class_type,
+            "dev_addr": dev_addr,
+            "dev_net_addr": dev_net_addr,
+            "dev_uptype": dev_uptype,
             "dev_key":1,
             "brand_logo":"http://gemvary.51vip.biz:3333/product-imgs/product/9c179ba94e5e42acaa57b82ffc78afea/38851c618e0528d75dc285e109f53c9c.jpg",
             "brand": dev_brand,
-            "dev_state": "", //"\{\\\"status\\\":\\\"on\\\",\\\"value\\\":1}\",
+            "dev_state": dev_state, //"\{\\\"status\\\":\\\"on\\\",\\\"value\\\":1}\",
             "dev_additional":"",
             "channel_id":0,
             "online":1,

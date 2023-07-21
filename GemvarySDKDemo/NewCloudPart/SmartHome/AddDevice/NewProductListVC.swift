@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import GemvaryToolSDK
 
 /// 新云端产品类型列表
 class NewProductListVC: UIViewController {
@@ -39,7 +40,7 @@ class NewProductListVC: UIViewController {
         }
         
         self.dataList = DeviceClass.query(gatewayType: GatewayType.zigbee)
-        swiftDebug("", self.dataList)
+        //swiftDebug("列表数据内容", ModelEncoder.encoder(toDictionaryArray: self.dataList) as Any)
     }
     
 }
@@ -79,13 +80,7 @@ extension NewProductListVC: UITableViewDelegate, UITableViewDataSource {
 
 
 class NewProductCell: UITableViewCell {
-    
-        
-    /**
-     (id: nil, gateway_type: Optional("zigbee"), dev_class_type: Optional("gem_cube"), dev_class_name: Optional("M6组合面板"), dev_class_name_en: nil, dev_class_name_tw: nil, dev_brand: nil, brand_str: nil, dev_describe: Optional("第一个按键连续按下4次，第5次是长按8S，直到灯光闪烁松开(如果上电超过10分钟，需连续操作两次)"), dev_describe_en: nil, dev_describe_tw: nil, dev_uptype: Optional(1), brand: nil, riu_id: nil)
-     
-     */
-    
+            
     private var nameLabel: UILabel = {
         let label = UILabel()
         return label

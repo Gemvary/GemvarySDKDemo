@@ -126,13 +126,18 @@ extension NewDeviceDetailsVC {
             return
         }
         
+        guard let dev_name = self.device.dev_name, let room_name = self.device.room_name else {
+            swiftDebug("当前设备名字为空")
+            return
+        }
+        
         let sendData = [
-            "msg_type" : "device_manager",
-            "command" : "delete",
-            "room_name" : self.device.room_name,
-            "from_role" : "phone",
+            "msg_type" : MsgType.device_manager,
+            "command" : Command.delete,
+            "room_name" : room_name,
+            "from_role" : FromRole.phone,
             "from_account" : account,
-            "dev_name" : self.device.dev_name
+            "dev_name" : dev_name
         ]
         
         guard let sendJson = JSONTool.translationObjToJson(from: sendData) else {
@@ -152,25 +157,42 @@ extension NewDeviceDetailsVC {
             swiftDebug("账号信息为空")
             return
         }
+        
+        guard let gid = self.device.gid,
+              let riu_id = self.device.riu_id,
+              let host_mac = self.device.host_mac,
+              let dev_net_addr = self.device.dev_net_addr,
+              let dev_addr = self.device.dev_addr,
+              let dev_uptype = self.device.dev_uptype,
+              let dev_class_type = self.device.dev_class_type,
+              let room_name = self.device.room_name,
+              let dev_key = self.device.dev_key,
+              let online = self.device.online,
+              let duration = self.device.duration
+        else {
+            swiftDebug("设备信息为空")
+            return
+        }
+        
         let sendData: [String: Any] = [
-            "msg_type": "device_manager",
+            "msg_type": MsgType.device_manager,
             "command": "update",
-            "from_role": "phone",
+            "from_role": FromRole.phone,
             "from_account": account,
-            "gid": "gid",
+            "gid": gid,
             
-            "riu_id":self.device.riu_id as Any,
-            "dev_addr":"hostInfo.devcode",
-            "dev_net_addr":"hostInfo.ip",
-            "host_mac":self.device.host_mac as Any,
-            "duration":1,
-            "online":1,
-            "dev_uptype":self.device.dev_uptype as Any,
+            "riu_id": riu_id,
+            "dev_addr": dev_addr,//"hostInfo.devcode",
+            "dev_net_addr": dev_net_addr, //"hostInfo.ip",
+            "host_mac": host_mac,
+            "duration": duration, //1,
+            "online": online, //1,
+            "dev_uptype": dev_uptype,
             
-            "dev_class_type":self.device.dev_class_type as Any,
-            "room_name":self.device.room_name as Any,
+            "dev_class_type": dev_class_type,
+            "room_name": room_name,
             "dev_name": dev_name, //self.device.dev_name as Any,
-            "dev_key":self.device.dev_key as Any,
+            "dev_key": dev_key,
         ]
         
         guard let sendJson = JSONTool.translationObjToJson(from: sendData) else {

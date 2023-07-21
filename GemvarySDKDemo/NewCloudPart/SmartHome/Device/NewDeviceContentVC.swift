@@ -24,7 +24,7 @@ class NewDeviceContentVC: UIViewController {
     }()
             
     private var dataList: [String] = [
-        "设备详情"
+        //"设备详情"
     ]
     
     var device: Device = Device() {
@@ -40,17 +40,24 @@ class NewDeviceContentVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        
-        
-        swiftDebug("设备内容:: ", self.device.dev_name as Any)
+                
         swiftDebug("设备内容数据:: ", self.device)
-//        swiftDebug("", JSONTool.translationObjToJson(from: self.device) as Any)
         
         self.view.addSubview(self.tableView)
         self.tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "设备详情", style: UIBarButtonItem.Style.plain, target: self, action: #selector(gotoDeviceDetailVC))
+        
+    }
+    
+    
+    /// 跳转到设备详情
+    @objc private func gotoDeviceDetailVC() {
+        swiftDebug("点击设备详情")
+        let newDeviceDetailsVC = NewDeviceDetailsVC()
+        newDeviceDetailsVC.device = self.device
+        self.navigationController?.pushViewController(newDeviceDetailsVC, animated: true)
     }
     
 }
@@ -83,10 +90,11 @@ extension NewDeviceContentVC: UITableViewDelegate, UITableViewDataSource {
             newDeviceDetailsVC.device = self.device
             self.navigationController?.pushViewController(newDeviceDetailsVC, animated: true)
             break
+        case "控制设备":
+            break
         default:
             break
         }
     }
-    
-    
+        
 }
