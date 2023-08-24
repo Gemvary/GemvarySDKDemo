@@ -10,37 +10,96 @@
 2.设置WebSocket相关，订阅WebSocket
 3.请求WebSocket数据
 
-## 示例代码:
-网络请求SDK简要说明
-* 初始化
+
+## 参考链接说明
+具体接口定义可以参见[iOS文档 服务器相关请求接口](http://gemvary.51vip.biz:5000/smarthome_sdk/ios_app_sdk/)部分说明，也可参见demo中具体功能模块中网络请求。
+[智能家居具体协议参考](http://gemvary.51vip.biz:5000)
+账号:`doc` 密码:`gemvary`
+
+```
+# 提交推送
+git push -u origin main
+```
+
+## SDK使用说明
+引入SDK
+```ruby
+# iOS工程至少需要iOS系统版本为10.0
+ platform :ios, '10.0'
+
+# 设置CocoaPods仓库源
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/Gemvary/GemvarySpec.git'
+
+  # 网络请求接口
+  pod 'GemvaryNetworkSDK' #, '~> 0.2.55'
+  # 智能家居相关
+  pod 'GemvarySmartHomeSDK'
+  # 常用工具
+  pod 'GemvaryToolSDK'
+  # 通用组件
+  pod 'GemvaryCommonSDK'
+
+```
+
+## SDK文档简要说明 
+### 项目初始化和登录模块
+#### 初始化模块
 ```swift
-// 智慧社区 服务器地址
-CommunityNetParam.domain = "http://test.gemvary.net:9090"
+// 默认测试服务器
+# CommunityNetParam.domain = "http://test.gemvary.net:9090"
 // 第三方使用SDK需要初始化参数
 CommunityNetParam.appId = "55deabd864df42afa4a779811f0a668c"
 CommunityNetParam.appSecret = "568f5ac2a827d161a12e1a052e5b6cc7"
 // 智能家居appID赋值
 SmartHomeManager.appId = "55deabd864df42afa4a779811f0a668c"
-// 新云端
-NewCloudNetParam.domain = "http://api.gemvary.tech:8443"
+// 新云端 默认测试服务器
+# NewCloudNetParam.domain = "http://api.gemvary.tech:8443"
 NewCloudNetParam.appId = "ea7ed63ea8af41aa9d327def9061cd6d"
 NewCloudNetParam.appSecret = "8aab7b3b869208bb8a8b0dd9632ae630"        
 ```
 
 初始化设置网络请求SDK相关接口的`域名`和`appId`和`appSecret`
+
+#### 登录模块
+* 使用账号验证码登录 
+
+* 使用Token登录
+1.设置参数
+```swift
+// appId和key需要服务器平台给出
+CloudWorkAPI.initCloudAPI(appId: "55deabd864df42afa4a779811f0a668c", key: "568f5ac2a827d161a12e1a052e5b6cc7")
+CloudWorkAPI.appId = "55deabd864df42afa4a779811f0a668c"
+CloudWorkAPI.key = "568f5ac2a827d161a12e1a052e5b6cc7"
+```
+2.登录获取Token
+```swift    
+// 调用登录接口
+// 输入账号和小区编码，具体需要和服务器平台对接
+CloudWorkAPI.appUserLogin(account: "", zone: "") { object in
+    // 转换类型到字典，保存Token等相关信息
+    UserTokenLogin.zoneCode = object.zoneCode
+    UserTokenLogin.tokenauth = object.tokenauth
+    UserTokenLogin.tokencode = object.tokencode
+}
+```
+3.调用网络请求其他接口或刷新Token
+* 根据SDK请求接口内容和参数说明调用相关接口
+* 如果请求返回状态码为`552`或`401`时，需要刷新Token
+```swift
+UserTokenLogin.loginWithToken {            
+    // 重新调用方法
+    self.adminUserFaceEditName(id: id, userName: userName, bindUserAccount: bindUserAccount)                    
+}
+```
+
+### 社区模块
+
+### 智能家居模块
+* 协议参考和接口说明文档
 具体接口定义可以参见[iOS文档 服务器相关请求接口](http://gemvary.51vip.biz:5000/smarthome_sdk/ios_app_sdk/)部分说明，也可参见demo中具体功能模块中网络请求。
-
-* 智能家居功能简要说明
-`WebSocket`处理内容可以参见`demo`的`WebSocketHandler`文件，
-
-
-
-
-
-
-智能家居具体协议参考
-http://gemvary.51vip.biz:5000
-账号:doc 密码:gemvary
+[智能家居具体协议参考](http://gemvary.51vip.biz:5000)
+账号:`doc` 密码:`gemvary`
 
 1.添加空间
 2.添加主机设备
@@ -48,24 +107,6 @@ http://gemvary.51vip.biz:5000
     2.2 局域网搜索主机设备
 3.添加节点设备
 
-```
-
-git push -u origin main
-```
-
-## Usage
-引入SDK
-```
-source 'https://github.com/Gemvary/GemvarySpec.git'
-
-  pod 'GemvaryNetworkSDK' #, '~> 0.2.55'
-  pod 'GemvarySmartHomeSDK'
-  pod 'GemvaryToolSDK'
-  pod 'GemvaryCommonSDK'
-
-```
-
-### 新设备上报
 {\"msg_type\":\"new_device_manager\",\"command\":\"up\",\"from_role\":\"business\",\"from_account\":\"259173ce40164413\",\"devices\":[{\"alloc_room\":0,\"new_dev_id\":0,\"dev_addr\":\"ccccccfffe18188a\",\"riu_id\":3,\"gateway_type\":\"zigbee\",\"dev_class_type\":\"smoke\",\"dev_net_addr\":\"f3fe\",\"dev_uptype\":0,\"brand\":\"gemvary.mlk\",\"host_mac\":\"259173ce40164413\",\"dev_key\":1,\"dev_state\":\"{\\\"status\\\":\\\"on\\\",\\\"value\\\":1}\"}]}
 
 {\"msg_type\":\"device_online_manager\",\"from_role\":\"devconn\",\"from_account\":\"259173ce40164413\",\"command\":\"up\",\"brand\":\"gemvary.lumi\",\"dev_class_type\":\"\",\"dev_uptype\":0,\"devices\":[{\"dev_addr\":\"ccccccfffe18188a\",\"dev_net_addr\":\"f3fe\",\"online\":1,\"dev_key\":1,\"attr\":\"\",\"brand\":\"gemvary.lumi\"}]}

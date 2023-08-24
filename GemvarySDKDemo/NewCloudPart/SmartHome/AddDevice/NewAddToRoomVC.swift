@@ -88,7 +88,7 @@ extension NewAddToRoomVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: self.footerID) as! NewAddToRoomFooterView
-        // 点击按钮
+        
         footerView.addButtonBlock = {
             self.addDeviceToRoom()
         }
